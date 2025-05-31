@@ -1,86 +1,80 @@
-<!-- Clone by @WusThanhDieu -->
 <!DOCTYPE html>
 <html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Github WusThanhDieu</title>
+    <title>Custom Message</title>
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/app.css" />
   </head>
   <body class="font-sans antialiased">
-    <div
-      id="app"
-      data-page='{
-        "component": "views/home",
-        "props": {
-          "errors": {},
-          "name": "Github WusThanhDieu",
-          "quote": {
-            "message": "",
-            "author": ""
-          },
-          "auth": {
-            "user": null
-          },
-          "ziggy": {
-            "port": null,
-            "defaults": [],
-            "routes": {
-              "home": {
-                "uri": "/",
-                "methods": ["GET", "HEAD"]
-              },
-              "show-create-form": {
-                "uri": "create-message/{id?}",
-                "methods": ["GET", "HEAD"],
-                "parameters": ["id"]
-              },
-              "create-form": {
-                "uri": "create-message",
-                "methods": ["POST"]
-              },
-              "login": {
-                "uri": "login",
-                "methods": ["GET", "HEAD"]
-              },
-              "logout": {
-                "uri": "logout",
-                "methods": ["POST"]
-              },
-              "storage.local": {
-                "uri": "storage/{path}",
-                "methods": ["GET", "HEAD"],
-                "wheres": {
-                  "path": ".*"
-                },
-                "parameters": ["path"]
-              }
-            },
-            "location": ""
-          },
-          "message": "",
-          "client": {
-            "fontName": "Mali",
-            "color": "#ff0019",
-            "messages": [
-              "Github WusThanhDieu",
-              "Test 1",
-              "Test 2"
-            ],
-            "music": "//thanhdieu.com/music.mp3"
-          },
-          "clientId": "/"
-        },
-        "url": "/",
-        "version": "",
-        "clearHistory": false,
-        "encryptHistory": false
+    <div>
+      <h1 class="text-xl mb-4">Tạo thông điệp tuỳ chỉnh</h1>
+      <form id="customForm">
+        <label>Title: <input type="text" id="title" /></label><br/>
+        <label>Name: <input type="text" id="name" /></label><br/>
+        <label>Color: <input type="color" id="color" /></label><br/>
+        <label>Music URL: <input type="text" id="music" /></label><br/>
+        <label>Messages (ngăn cách bằng dấu `|`):<br/>
+          <textarea id="messages" rows="4" cols="50"></textarea>
+        </label><br/>
+        <button type="submit">Tạo link</button>
+      </form>
+
+      <p id="generatedLink" class="mt-4 font-mono text-sm"></p>
+    </div>
+
+    <div id="app"></div>
+
+    <script type="module" src="/static/js/app.js"></script>
+    <script type="module" src="/static/js/home.js"></script>
+
+    <script>
+      // Encode object to base64
+      function encodeParams(data) {
+        const json = JSON.stringify(data);
+        return btoa(encodeURIComponent(json));
       }
-      '
-    >
-  </div>
-  <script type="module" src="/static/js/app.js"></script>
-  <script type="module" src="/static/js/home.js"></script>
+
+      // Decode base64 params if exists
+      function decodeParams(encoded) {
+        try {
+          const json = decodeURIComponent(atob(encoded));
+          return JSON.parse(json);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      document.getElementById("customForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const data = {
+          title: document.getElementById("title").value,
+          name: document.getElementById("name").value,
+          color: document.getElementById("color").value,
+          music: document.getElementById("music").value,
+          messages: document.getElementById("messages").value.split("|").map(s => s.trim())
+        };
+        const encoded = encodeParams(data);
+        const link = `${location.origin}${location.pathname}?data=${encoded}`;
+        document.getElementById("generatedLink").innerText = link;
+      });
+
+      // Auto-load params from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const dataParam = urlParams.get("data");
+      if (dataParam) {
+        const config = decodeParams(dataParam);
+        if (config) {
+          document.title = config.title || "Custom Message";
+          const app = document.getElementById("app");
+          app.innerHTML = `
+            <h2 style="color: ${config.color}; font-size: 24px;">${config.name}</h2>
+            <ul>${config.messages.map(m => `<li>${m}</li>`).join("")}</ul>
+            <audio controls autoplay src="${config.music}"></audio>
+          `;
+        }
+      }
+    </script>
   </body>
 </html>
