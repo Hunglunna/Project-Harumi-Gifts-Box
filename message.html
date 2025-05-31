@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>hunglunna</title>
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/app.css" />
+  </head>
+  <body class="font-sans antialiased">
+    <div
+      id="app"
+      data-page='{
+        "component": "views/home",
+        "props": {
+          "errors": {},
+          "name": "hunglunna",
+          "quote": {
+            "message": "",
+            "author": ""
+          },
+          "auth": {
+            "user": null
+          },
+          "ziggy": {
+            "port": null,
+            "defaults": [],
+            "routes": {
+              "home": {
+                "uri": "/",
+                "methods": ["GET", "HEAD"]
+              },
+              "show-create-form": {
+                "uri": "create-message/{id?}",
+                "methods": ["GET", "HEAD"],
+                "parameters": ["id"]
+              },
+              "create-form": {
+                "uri": "create-message",
+                "methods": ["POST"]
+              },
+              "login": {
+                "uri": "login",
+                "methods": ["GET", "HEAD"]
+              },
+              "logout": {
+                "uri": "logout",
+                "methods": ["POST"]
+              },
+              "storage.local": {
+                "uri": "storage/{path}",
+                "methods": ["GET", "HEAD"],
+                "wheres": {
+                  "path": ".*"
+                },
+                "parameters": ["path"]
+              }
+            },
+            "location": ""
+          },
+          "message": "",
+          "client": {
+            "fontName": "Mali",
+            "color": "#ff0019",
+            "messages": [
+  "Hưng lúc nào cũng nhắc đến Tuyết 🥰",
+  "Tình yêu của Hưng dành cho Tuyết nhiều như sao trên trời ⭐",
+  "Hưng yêu Tuyết hơn cả cơm mẹ nấu 💖",
+  "Sáng mở mắt Hưng nghĩ đến Tuyết, tối nhắm mắt cũng là Tuyết trong đầu 💭",
+  "Nếu Tuyết là bài kiểm tra, Hưng chắc chắn 100 điểm không cần ôn 🎯",
+  "Người ta yêu mùa đông vì có tuyết, còn Hưng yêu đời vì có Tuyết ☃️",
+  "Chỉ cần Tuyết cười, Hưng có thể quên ăn quên ngủ 😊",
+  "Tuyết ơi, trong lòng Hưng, em là WiFi – vì em làm cuộc sống Hưng kết nối 📶",
+  "Điện thoại Hưng hết pin nhưng tình yêu dành cho Tuyết thì không bao giờ hết 🔋❤️",
+  "Nếu mỗi lần Hưng nghĩ về Tuyết là một bông hoa, chắc giờ Hưng có cả một cánh đồng 🌸"
+]
+,
+            "music": "//thanhdieu.com/music.mp3"
+          },
+          "clientId": "/"
+        },
+        "url": "/",
+        "version": "",
+        "clearHistory": false,
+        "encryptHistory": false
+      }
+      '
+    >
+  </div>
+  <script type="module" src="/static/js/app.js"></script>
+  <script type="module" src="/static/js/home.js"></script>
+  </body>
+</html>
