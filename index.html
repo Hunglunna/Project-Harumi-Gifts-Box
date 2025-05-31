@@ -1,108 +1,54 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>hunglunna</title>
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <title>Tạo thông điệp</title>
     <link rel="stylesheet" href="/static/css/app.css" />
+    <style>
+      body { padding: 2rem; font-family: sans-serif; max-width: 600px; margin: auto; }
+      input, textarea { width: 100%; margin-bottom: 1rem; padding: 0.5rem; }
+    </style>
   </head>
-  <body class="font-sans antialiased">
+  <body>
+    <h1>🔧 Tạo thông điệp yêu thương</h1>
 
-    <div id="app"></div>
+    <label>Tiêu đề trang:</label>
+    <input id="title" placeholder="VD: Gửi Tuyết yêu dấu 💌" />
 
-    <script type="module" src="/static/js/app.js"></script>
-    <script type="module" src="/static/js/home.js"></script>
+    <label>Tên người gửi:</label>
+    <input id="name" placeholder="VD: Hưng cute 😘" />
+
+    <label>Màu chữ (mã hex):</label>
+    <input id="color" value="#ff0019" />
+
+    <label>Nhạc nền (link mp3):</label>
+    <input id="music" value="//thanhdieu.com/music.mp3" />
+
+    <label>Các thông điệp (mỗi dòng 1 câu):</label>
+    <textarea id="messages" rows="6">Hưng lúc nào cũng nhắc đến Tuyết 🥰
+Hưng yêu Tuyết hơn cả cơm mẹ nấu 💖</textarea>
+
+    <button onclick="generateLink()">Tạo link 💌</button>
+
+    <p id="result"></p>
 
     <script>
-      function decodeParams(encoded) {
-        try {
-          const json = decodeURIComponent(atob(encoded));
-          return JSON.parse(json);
-        } catch (e) {
-          console.warn("Decode failed:", e);
-          return null;
-        }
+      function generateLink() {
+        const data = {
+          title: document.getElementById("title").value || "hunglunna",
+          name: document.getElementById("name").value || "hunglunna",
+          color: document.getElementById("color").value || "#ff0019",
+          music: document.getElementById("music").value || "//thanhdieu.com/music.mp3",
+          messages: document.getElementById("messages").value.trim().split("\n")
+        };
+
+        const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
+        const url = `/message.html?data=${encoded}`;
+
+        document.getElementById("result").innerHTML = `
+          ✅ Link đã tạo: <a href="${url}" target="_blank">${url}</a>
+        `;
       }
-
-      // Giá trị mặc định
-      const defaultConfig = {
-        title: "hunglunna",
-        name: "hunglunna",
-        color: "#ff0019",
-        messages: [
-          "Hưng lúc nào cũng nhắc đến Tuyết 🥰",
-          "Tình yêu của Hưng dành cho Tuyết nhiều như sao trên trời ⭐",
-          "Hưng yêu Tuyết hơn cả cơm mẹ nấu 💖",
-          "Sáng mở mắt Hưng nghĩ đến Tuyết, tối nhắm mắt cũng là Tuyết trong đầu 💭",
-          "Nếu Tuyết là bài kiểm tra, Hưng chắc chắn 100 điểm không cần ôn 🎯",
-          "Người ta yêu mùa đông vì có tuyết, còn Hưng yêu đời vì có Tuyết ☃️",
-          "Chỉ cần Tuyết cười, Hưng có thể quên ăn quên ngủ 😊",
-          "Tuyết ơi, trong lòng Hưng, em là WiFi – vì em làm cuộc sống Hưng kết nối 📶",
-          "Điện thoại Hưng hết pin nhưng tình yêu dành cho Tuyết thì không bao giờ hết 🔋❤️",
-          "Nếu mỗi lần Hưng nghĩ về Tuyết là một bông hoa, chắc giờ Hưng có cả một cánh đồng 🌸"
-        ],
-        music: "//thanhdieu.com/music.mp3"
-      };
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const dataParam = urlParams.get("data");
-      const config = dataParam ? decodeParams(dataParam) : {};
-      const merged = { ...defaultConfig, ...config };
-
-      // Đổi tiêu đề trang
-      document.title = merged.title;
-
-      // Render lại cấu trúc dữ liệu như ban đầu
-      const appDiv = document.getElementById("app");
-      const dataPage = {
-        component: "views/home",
-        props: {
-          errors: {},
-          name: merged.name,
-          quote: {
-            message: "",
-            author: ""
-          },
-          auth: { user: null },
-          ziggy: {
-            port: null,
-            defaults: [],
-            routes: {
-              home: { uri: "/", methods: ["GET", "HEAD"] },
-              "show-create-form": {
-                uri: "create-message/{id?}",
-                methods: ["GET", "HEAD"],
-                parameters: ["id"]
-              },
-              "create-form": { uri: "create-message", methods: ["POST"] },
-              login: { uri: "login", methods: ["GET", "HEAD"] },
-              logout: { uri: "logout", methods: ["POST"] },
-              "storage.local": {
-                uri: "storage/{path}",
-                methods: ["GET", "HEAD"],
-                wheres: { path: ".*" },
-                parameters: ["path"]
-              }
-            },
-            location: ""
-          },
-          message: "",
-          client: {
-            fontName: "Mali",
-            color: merged.color,
-            messages: merged.messages,
-            music: merged.music
-          },
-          clientId: "/"
-        },
-        url: "/",
-        version: "",
-        clearHistory: false,
-        encryptHistory: false
-      };
-
-      appDiv.setAttribute("data-page", JSON.stringify(dataPage));
     </script>
   </body>
 </html>
