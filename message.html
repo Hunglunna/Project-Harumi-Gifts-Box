@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title id="page-title">hunglunna</title>
+    <title>hunglunna</title>
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/app.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
@@ -12,30 +12,36 @@
     <div id="app"></div>
 
     <script type="module">
-      // Lấy đoạn mã từ URL sau "/m/"
+      // Lấy mã từ URL sau /m/
       const encoded = location.pathname.split("/m/")[1];
 
       if (!encoded) {
         document.body.innerHTML = "<h1>Không tìm thấy nội dung!</h1>";
-        throw new Error("Missing encoded data");
+        throw new Error("Thiếu mã dữ liệu.");
       }
 
-      // Giải mã dữ liệu
-      const jsonStr = LZString.decompressFromEncodedURIComponent(encoded);
-      const data = JSON.parse(jsonStr);
+      try {
+        const jsonStr = LZString.decompressFromEncodedURIComponent(encoded);
+        const data = JSON.parse(jsonStr);
 
-      // Gán dữ liệu vào trang
-      document.title = data.props.name || "hunglunna";
+        document.title = data.props?.name || "hunglunna";
 
-      const div = document.createElement("div");
-      div.setAttribute("id", "app");
-      div.setAttribute("data-page", JSON.stringify(data));
-      document.body.innerHTML = "";
-      document.body.appendChild(div);
+        const appDiv = document.getElementById("app");
+        appDiv.setAttribute("data-page", JSON.stringify({
+          component: "views/home",
+          props: data.props,
+          url: "/",
+          version: "",
+          clearHistory: false,
+          encryptHistory: false
+        }));
 
-      // Gọi lại script chính
-      import("/static/js/app.js");
-      import("/static/js/home.js");
+        // Gọi lại JS chính của trang
+        import("/static/js/app.js");
+        import("/static/js/home.js");
+      } catch (e) {
+        document.body.innerHTML = `<h1>Lỗi khi giải mã dữ liệu: ${e.message}</h1>`;
+      }
     </script>
   </body>
 </html>
