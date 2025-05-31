@@ -6,90 +6,56 @@
     <title>hunglunna</title>
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/app.css" />
+    <script src="https://cdn.jsdelivr.net/npm/lz-string/libs/lz-string.min.js"></script>
+    <style>
+      body { padding: 2rem; font-family: 'Instrument Sans', sans-serif; text-align: center; }
+      .message { margin: 1rem 0; font-size: 1.25rem; }
+    </style>
   </head>
   <body class="font-sans antialiased">
-    <div
-      id="app"
-      data-page='{
-        "component": "views/home",
-        "props": {
-          "errors": {},
-          "name": "hunglunna",
-          "quote": {
-            "message": "",
-            "author": ""
-          },
-          "auth": {
-            "user": null
-          },
-          "ziggy": {
-            "port": null,
-            "defaults": [],
-            "routes": {
-              "home": {
-                "uri": "/",
-                "methods": ["GET", "HEAD"]
-              },
-              "show-create-form": {
-                "uri": "create-message/{id?}",
-                "methods": ["GET", "HEAD"],
-                "parameters": ["id"]
-              },
-              "create-form": {
-                "uri": "create-message",
-                "methods": ["POST"]
-              },
-              "login": {
-                "uri": "login",
-                "methods": ["GET", "HEAD"]
-              },
-              "logout": {
-                "uri": "logout",
-                "methods": ["POST"]
-              },
-              "storage.local": {
-                "uri": "storage/{path}",
-                "methods": ["GET", "HEAD"],
-                "wheres": {
-                  "path": ".*"
-                },
-                "parameters": ["path"]
-              }
-            },
-            "location": ""
-          },
-          "message": "",
-          "client": {
-            "fontName": "Mali",
-            "color": "#ff0019",
-            "messages": [
-  "Hưng lúc nào cũng nhắc đến Tuyết 🥰",
-  "Tình yêu của Hưng dành cho Tuyết nhiều như sao trên trời ⭐",
-  "Hưng yêu Tuyết hơn cả cơm mẹ nấu 💖",
-  "Sáng mở mắt Hưng nghĩ đến Tuyết, tối nhắm mắt cũng là Tuyết trong đầu 💭",
-  "Nếu Tuyết là bài kiểm tra, Hưng chắc chắn 100 điểm không cần ôn 🎯",
-  "Người ta yêu mùa đông vì có tuyết, còn Hưng yêu đời vì có Tuyết ☃️",
-  "Chỉ cần Tuyết cười, Hưng có thể quên ăn quên ngủ 😊",
-  "Tuyết ơi, trong lòng Hưng, em là WiFi – vì em làm cuộc sống Hưng kết nối 📶",
-  "Điện thoại Hưng hết pin nhưng tình yêu dành cho Tuyết thì không bao giờ hết 🔋❤️",
-  "Nếu mỗi lần Hưng nghĩ về Tuyết là một bông hoa, chắc giờ Hưng có cả một cánh đồng 🌸"
-]
-,
-            "music": "//thanhdieu.com/music.mp3"
-          },
-          "clientId": "/"
-        },
-        "url": "/",
-        "version": "",
-        "clearHistory": false,
-        "encryptHistory": false
-      }
-      '
-    >
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/lz-string/libs/lz-string.min.js"></script>
+    <div id="app"></div>
+    <audio id="music" autoplay loop></audio>
 
-  <script type="module" src="/static/js/app.js"></script>
-  <script type="module" src="/static/js/home.js"></script>
+    <script>
+      function getCompressedData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const compressed = urlParams.get("data");
+        if (!compressed) {
+          document.getElementById("app").innerHTML = "<h2>❌ Dữ liệu không hợp lệ.</h2>";
+          return null;
+        }
+        try {
+          const json = LZString.decompressFromEncodedURIComponent(compressed);
+          return JSON.parse(json);
+        } catch (e) {
+          document.getElementById("app").innerHTML = "<h2>❌ Không thể giải mã dữ liệu.</h2>";
+          return null;
+        }
+      }
+
+      const data = getCompressedData();
+      if (data) {
+        document.title = data.title || "hunglunna";
+        document.body.style.color = data.color || "#000";
+
+        const app = document.getElementById("app");
+        app.innerHTML = `
+          <h1>${data.title}</h1>
+          <h2>❤️ Từ: ${data.name}</h2>
+          <div id="messages"></div>
+        `;
+
+        const msgContainer = document.getElementById("messages");
+        data.messages.forEach(msg => {
+          const div = document.createElement("div");
+          div.className = "message";
+          div.textContent = msg;
+          msgContainer.appendChild(div);
+        });
+
+        const music = document.getElementById("music");
+        music.src = data.music || "";
+      }
+    </script>
   </body>
 </html>
