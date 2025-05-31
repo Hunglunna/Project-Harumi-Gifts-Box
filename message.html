@@ -6,42 +6,95 @@
     <title>hunglunna</title>
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/app.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
   </head>
   <body class="font-sans antialiased">
     <div id="app"></div>
 
     <script type="module">
-      // Lấy mã từ URL sau /m/
-      const encoded = location.pathname.split("/m/")[1];
+      import { decompressFromEncodedURIComponent } from "https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js";
 
-      if (!encoded) {
-        document.body.innerHTML = "<h1>Không tìm thấy nội dung!</h1>";
-        throw new Error("Thiếu mã dữ liệu.");
+      // Bắt dữ liệu từ URL
+      const params = new URLSearchParams(location.search);
+      const encoded = params.get('data');
+
+      let data = {
+        component: "views/home",
+        props: {
+          errors: {},
+          name: "hunglunna",
+          quote: {
+            message: "",
+            author: ""
+          },
+          auth: {
+            user: null
+          },
+          ziggy: {
+            port: null,
+            defaults: [],
+            routes: {
+              "home": {
+                "uri": "/",
+                "methods": ["GET", "HEAD"]
+              },
+              "show-create-form": {
+                "uri": "create-message/{id?}",
+                "methods": ["GET", "HEAD"],
+                "parameters": ["id"]
+              },
+              "create-form": {
+                "uri": "create-message",
+                "methods": ["POST"]
+              },
+              "login": {
+                "uri": "login",
+                "methods": ["GET", "HEAD"]
+              },
+              "logout": {
+                "uri": "logout",
+                "methods": ["POST"]
+              },
+              "storage.local": {
+                "uri": "storage/{path}",
+                "methods": ["GET", "HEAD"],
+                "wheres": {
+                  "path": ".*"
+                },
+                "parameters": ["path"]
+              }
+            },
+            location: ""
+          },
+          message: "",
+          client: {
+            fontName: "Mali",
+            color: "#ff0019",
+            messages: [],
+            music: "//thanhdieu.com/music.mp3"
+          },
+          clientId: "/"
+        },
+        url: "/",
+        version: "",
+        clearHistory: false,
+        encryptHistory: false
+      };
+
+      if (encoded) {
+        try {
+          const decoded = decompressFromEncodedURIComponent(encoded);
+          const parsed = JSON.parse(decoded);
+          Object.assign(data.props.client, parsed);
+        } catch (e) {
+          console.error("Lỗi giải mã dữ liệu:", e);
+        }
       }
 
-      try {
-        const jsonStr = LZString.decompressFromEncodedURIComponent(encoded);
-        const data = JSON.parse(jsonStr);
-
-        document.title = data.props?.name || "hunglunna";
-
-        const appDiv = document.getElementById("app");
-        appDiv.setAttribute("data-page", JSON.stringify({
-          component: "views/home",
-          props: data.props,
-          url: "/",
-          version: "",
-          clearHistory: false,
-          encryptHistory: false
-        }));
-
-        // Gọi lại JS chính của trang
-        import("/static/js/app.js");
-        import("/static/js/home.js");
-      } catch (e) {
-        document.body.innerHTML = `<h1>Lỗi khi giải mã dữ liệu: ${e.message}</h1>`;
-      }
+      // Gắn dữ liệu vào #app
+      document.getElementById('app').setAttribute('data-page', JSON.stringify(data));
     </script>
+
+    <script type="module" src="/static/js/app.js"></script>
+    <script type="module" src="/static/js/home.js"></script>
   </body>
 </html>
