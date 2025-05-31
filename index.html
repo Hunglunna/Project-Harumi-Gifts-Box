@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <title>Tạo thông điệp</title>
     <link rel="stylesheet" href="/static/css/app.css" />
+    <script src="https://cdn.jsdelivr.net/npm/lz-string/libs/lz-string.min.js"></script>
     <style>
       body { padding: 2rem; font-family: sans-serif; max-width: 600px; margin: auto; }
-      input, textarea { width: 100%; margin-bottom: 1rem; padding: 0.5rem; }
+      input, textarea, button { width: 100%; margin-bottom: 1rem; padding: 0.5rem; }
     </style>
   </head>
   <body>
@@ -26,12 +27,11 @@
 
     <label>Các thông điệp (mỗi dòng 1 câu):</label>
     <textarea id="messages" rows="6">Hưng lúc nào cũng nhắc đến Tuyết 🥰
-Hưng yêu Tuyết hơn cả cơm mẹ nấu 💖</textarea>
+Tình yêu của Hưng dành cho Tuyết nhiều như sao trên trời ⭐</textarea>
 
     <button onclick="generateLink()">Tạo link 💌</button>
 
     <p id="result"></p>
-<script src="https://cdn.jsdelivr.net/npm/lz-string/libs/lz-string.min.js"></script>
 
     <script>
       function generateLink() {
@@ -43,8 +43,8 @@ Hưng yêu Tuyết hơn cả cơm mẹ nấu 💖</textarea>
           messages: document.getElementById("messages").value.trim().split("\n")
         };
 
-        const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
-        const url = `/message.html?data=${encoded}`;
+        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+        const url = `/message.html?data=${compressed}`;
 
         document.getElementById("result").innerHTML = `
           ✅ Link đã tạo: <a href="${url}" target="_blank">${url}</a>
