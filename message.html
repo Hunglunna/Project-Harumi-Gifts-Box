@@ -3,59 +3,39 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>hunglunna</title>
+    <title id="page-title">hunglunna</title>
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet"/>
     <link rel="stylesheet" href="/static/css/app.css" />
-    <script src="https://cdn.jsdelivr.net/npm/lz-string/libs/lz-string.min.js"></script>
-    <style>
-      body { padding: 2rem; font-family: 'Instrument Sans', sans-serif; text-align: center; }
-      .message { margin: 1rem 0; font-size: 1.25rem; }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
   </head>
   <body class="font-sans antialiased">
     <div id="app"></div>
-    <audio id="music" autoplay loop></audio>
 
-    <script>
-      function getCompressedData() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const compressed = urlParams.get("data");
-        if (!compressed) {
-          document.getElementById("app").innerHTML = "<h2>❌ Dữ liệu không hợp lệ.</h2>";
-          return null;
-        }
-        try {
-          const json = LZString.decompressFromEncodedURIComponent(compressed);
-          return JSON.parse(json);
-        } catch (e) {
-          document.getElementById("app").innerHTML = "<h2>❌ Không thể giải mã dữ liệu.</h2>";
-          return null;
-        }
+    <script type="module">
+      // Lấy đoạn mã từ URL sau "/m/"
+      const encoded = location.pathname.split("/m/")[1];
+
+      if (!encoded) {
+        document.body.innerHTML = "<h1>Không tìm thấy nội dung!</h1>";
+        throw new Error("Missing encoded data");
       }
 
-      const data = getCompressedData();
-      if (data) {
-        document.title = data.title || "hunglunna";
-        document.body.style.color = data.color || "#000";
+      // Giải mã dữ liệu
+      const jsonStr = LZString.decompressFromEncodedURIComponent(encoded);
+      const data = JSON.parse(jsonStr);
 
-        const app = document.getElementById("app");
-        app.innerHTML = `
-          <h1>${data.title}</h1>
-          <h2>❤️ Từ: ${data.name}</h2>
-          <div id="messages"></div>
-        `;
+      // Gán dữ liệu vào trang
+      document.title = data.props.name || "hunglunna";
 
-        const msgContainer = document.getElementById("messages");
-        data.messages.forEach(msg => {
-          const div = document.createElement("div");
-          div.className = "message";
-          div.textContent = msg;
-          msgContainer.appendChild(div);
-        });
+      const div = document.createElement("div");
+      div.setAttribute("id", "app");
+      div.setAttribute("data-page", JSON.stringify(data));
+      document.body.innerHTML = "";
+      document.body.appendChild(div);
 
-        const music = document.getElementById("music");
-        music.src = data.music || "";
-      }
+      // Gọi lại script chính
+      import("/static/js/app.js");
+      import("/static/js/home.js");
     </script>
   </body>
 </html>
